@@ -1,7 +1,8 @@
 import os
-from datetime import timedelta
-
 import environ
+
+from datetime import timedelta
+from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as thumbnail_settings
 
 root = environ.Path(__file__) - 3        # three folder back (/a/b/c/ - 3 = /)
@@ -321,6 +322,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'accounting.tasks.bill_timeline_entries',
         'schedule': timedelta(minutes=1),
     },
+    'notify_student_subscription': {
+        'task': 'market.tasks.notify_student_subscription',
+        'schedule': crontab(hour='12', minute='0'),
+    }
 }
 
 

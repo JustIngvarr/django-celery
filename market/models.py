@@ -103,6 +103,7 @@ class Subscription(ProductContainer):
     duration = models.DurationField(editable=False)  # every subscription cares a duration field, taken from its product
 
     first_lesson_date = models.DateTimeField('Date of the first lesson', editable=False, null=True)
+    last_lesson_date = models.DateTimeField('Date of the last lesson', editable=False, null=True)
 
     def __str__(self):
         return self.name_for_user
@@ -175,6 +176,14 @@ class Subscription(ProductContainer):
             if first_class:
                 self.first_lesson_date = first_class.timeline.start
                 self.save()
+
+    def update_last_lesson_date(self):
+        """
+        Update last lesson date
+        """
+        if not self.is_fully_used:
+            self.last_lesson_date = timezone.now()
+            self.save()
 
     def class_status(self):
         """
@@ -392,6 +401,7 @@ class Class(ProductContainer):
         if self.subscription:
             self.subscription.update_first_lesson_date()
             self.subscription.check_is_fully_finished()
+            self.subscription.update_last_lesson_date()
 
     def _save_scheduled(self, *args, **kwargs):
         """
